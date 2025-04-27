@@ -1,0 +1,33 @@
+{
+    "name": "reminder-bot",
+    "private": true,
+    "type": "module",
+    "packageManager": "yarn@4.9.1",
+    "scripts": {
+        "build": "rm -rf dist && tsc",
+        "start": "node dist/index.js",
+        "register": "node dist/register.js",
+        "deploy": "wrangler deploy",
+        "dev": "wrangler dev",
+        "tunnel": "ngrok http 8787"
+    },
+    "devDependencies": {
+        "@bristlefrost/eslint-config": "^1.1.2",
+        "@bristlefrost/prettier-config": "^1.1.0",
+        "@cloudflare/workers-types": "^4.20250427.0",
+        "@types/node-schedule": "^2",
+        "discord-api-types": "^0.38.1",
+        "eslint": "^9.25.1",
+        "prettier": "^3.5.3",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.31.0",
+        "wrangler": "^4.13.2"
+    },
+    "dependencies": {
+        "chrono-node": "^2.8.0",
+        "discord-interactions": "^4.1.1",
+        "dotenv": "^16.5.0",
+        "itty-router": "^5.0.18",
+        "node-schedule": "^2.1.1"
+    }
+}

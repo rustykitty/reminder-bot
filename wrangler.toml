@@ -1,0 +1,9 @@
+name = "ketchup-bot"
+main = "./dist/index.js"
+compatibility_date="2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "reminder-bot"
+database_id = "38e66a6d-a81d-4af2-bc57-5900479b333f"

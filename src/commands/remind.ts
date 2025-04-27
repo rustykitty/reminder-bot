@@ -1,0 +1,61 @@
+import * as DAPI from 'discord-api-types/v10';
+import * as chrono from 'chrono-node';
+import { InteractionResponseType } from 'discord-interactions';
+import { JsonResponse } from '../response.js';
+
+
+import { Command } from './command.js';
+import { getOptions } from './options.js';
+
+export const remind: Command = {
+    data: {
+        name: 'remind',
+        description: 'Set a reminder.',
+        options: [
+            {
+                type: DAPI.ApplicationCommandOptionType.String,
+                name: 'time',
+                description: 'When do you want to be reminded?',
+                required: true,
+            },
+            {
+                type: DAPI.ApplicationCommandOptionType.String,
+                name: 'message',
+                description: 'What do you want to be reminded about?',
+                required: true,
+            },
+        ],
+    },
+    execute: async (interaction, env) => {
+        const db: D1Database = env.DB;
+        const user_id = interaction.guild ? interaction.member?.user.id : interaction.user?.id;
+        const { time, message } = getOptions(interaction);
+        const date: Date | null = chrono.parseDate(time.value as string);
+        if (date === null) {
+            return new JsonResponse({
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                data: {
+                    content: 'Invalid date format.',
+                },
+            });
+        }
+        const ts = Math.floor(+date / 1000);
+        if (ts <= Math.floor(+new Date() / 1000)) {
+            return new JsonResponse({
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                data: {
+                    content: `You can't set a reminder in the past!`,
+                },
+            });
+        }
+        const result: D1Result<DBRow> = await db.prepare(
+            `INSERT INTO reminders (user_id, message, timestamp) VALUES (?, ?, ?)`,
+        ).bind(user_id, message.value, ts).run();
+        return new JsonResponse({
+            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            data: {
+                content: `I will remind you about "${message.value}" <t:${ts}:R>.`,
+            },
+        });
+    }
+}
