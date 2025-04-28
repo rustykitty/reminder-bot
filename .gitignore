@@ -288,3 +288,4 @@ fabric.properties
 ### End VisualStudioCode ###
 
 .dev.vars
+.wrangler

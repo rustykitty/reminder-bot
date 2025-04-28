@@ -2,13 +2,11 @@ import { AutoRouter } from 'itty-router';
 import { InteractionResponseFlags, InteractionResponseType, InteractionType, verifyKey } from 'discord-interactions';
 import { JsonResponse } from './response.js';
 import commands from './commands/commands.js';
+import { scheduled } from './scheduled.js';
 
 const router = AutoRouter();
 
-async function verifyDiscordRequest(
-    request: Request,
-    env: Env,
-): Promise<{ interaction?: any; isValid: boolean }> {
+async function verifyDiscordRequest(request: Request, env: Env): Promise<{ interaction?: any; isValid: boolean }> {
     const signature = request.headers.get('X-Signature-Ed25519');
     const timestamp = request.headers.get('X-Signature-Timestamp');
     const body: string = await request.text();
@@ -71,6 +69,7 @@ router.all('*', () => new Response('Not Found.', { status: 404 }));
 const index = {
     verifyDiscordRequest,
     fetch: router.fetch,
+    scheduled
 };
 
 export default index;

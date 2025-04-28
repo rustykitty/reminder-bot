@@ -1,9 +1,8 @@
 import * as DAPI from 'discord-api-types/v10';
 import * as chrono from 'chrono-node';
+
 import { InteractionResponseType } from 'discord-interactions';
 import { JsonResponse } from '../response.js';
-
-
 import { Command } from './command.js';
 import { getOptions } from './options.js';
 
@@ -59,3 +58,28 @@ export const remind: Command = {
         });
     }
 }
+
+export const list_reminders: Command = {
+    data: {
+        name: 'list-reminders',
+        description: 'List your reminders',
+    },
+    execute: async (interaction, env) => {
+        const db: D1Database = env.DB;
+        const user_id = interaction.guild ? interaction.member?.user.id : interaction.user?.id;
+        const result: D1Result<DBRow> = await db.prepare(
+            `SELECT * FROM reminders WHERE user_id = ?`,
+        ).bind(user_id).run();
+        const remindersText = result.results.map((element, index, array) => {
+            const { message, timestamp } = element;
+            const date = new Date(timestamp * 1000);
+            return `- ${message} <t:${timestamp}:F>`;
+        })
+        return new JsonResponse({
+            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            data: {
+                content: `You have the following reminders:`,
+            },
+        });
+    },
+};

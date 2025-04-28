@@ -4,5 +4,5 @@ CREATE TABLE reminders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id VARCHAR(20) NOT NULL,
     message VARCHAR(255) NOT NULL,
-    timestamp INT NOT NULL
+    timestamp INTEGER NOT NULL
 );

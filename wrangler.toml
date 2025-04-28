@@ -7,3 +7,6 @@ compatibility_flags = ["nodejs_compat"]
 binding = "DB"
 database_name = "reminder-bot"
 database_id = "38e66a6d-a81d-4af2-bc57-5900479b333f"
+
+[triggers]
+crons = ["* * * * *"]
