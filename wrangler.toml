@@ -1,4 +1,4 @@
-name = "ketchup-bot"
+name = "reminder-bot"
 main = "./dist/index.js"
 compatibility_date="2024-09-23"
 compatibility_flags = ["nodejs_compat"]
@@ -10,3 +10,6 @@ database_id = "38e66a6d-a81d-4af2-bc57-5900479b333f"
 
 [triggers]
 crons = ["* * * * *"]
+
+[observability.logs]
+enabled = true
