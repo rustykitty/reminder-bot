@@ -34,4 +34,5 @@ interface Env {
     DISCORD_PUBLIC_KEY: string;
     DISCORD_APPLICATION_ID: string;
     DISCORD_TOKEN: string;
+    GROQ_API_KEY: string;
 }

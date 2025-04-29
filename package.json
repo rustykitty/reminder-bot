@@ -29,6 +29,7 @@
         "chrono-node": "^2.8.0",
         "discord-interactions": "^4.1.1",
         "dotenv": "^16.5.0",
+        "groq-sdk": "^0.20.1",
         "itty-router": "^5.0.18",
         "node-schedule": "^2.1.1"
     }
