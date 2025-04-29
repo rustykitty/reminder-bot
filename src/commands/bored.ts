@@ -16,7 +16,7 @@ async function getBoredActivity(apiKey: string) {
                 content: `You are a generative large language model integrated into a Reminders application. 
                           Your purpose is to provide the user with an activity or task to do when they are bored. 
                           Provide only the name of the task. For example: Going outside and touching grass.
-                          Make sure to keep the response concise, and keep the task to something that anyone can do.`
+                          Make sure to keep the response concise, and keep the task to something that anyone can do.`,
             },
             {
                 role: 'user',
@@ -24,7 +24,7 @@ async function getBoredActivity(apiKey: string) {
             },
         ],
     });
-    const result = chatCompletion.choices[0].message.content || "";
+    const result = chatCompletion.choices[0].message.content || '';
     return result;
 }
 

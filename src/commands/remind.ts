@@ -47,17 +47,18 @@ export const remind: Command = {
                 },
             });
         }
-        const result: D1Result<DBRow> = await db.prepare(
-            `INSERT INTO reminders (user_id, message, timestamp) VALUES (?, ?, ?)`,
-        ).bind(user_id, message.value, ts).run();
+        const result: D1Result<DBRow> = await db
+            .prepare(`INSERT INTO reminders (user_id, message, timestamp) VALUES (?, ?, ?)`)
+            .bind(user_id, message.value, ts)
+            .run();
         return new JsonResponse({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data: {
                 content: `I will remind you about "${message.value}" <t:${ts}:R>.`,
             },
         });
-    }
-}
+    },
+};
 
 export const list_reminders: Command = {
     data: {
@@ -67,14 +68,15 @@ export const list_reminders: Command = {
     execute: async (interaction, env) => {
         const db: D1Database = env.DB;
         const user_id = interaction.guild ? interaction.member?.user.id : interaction.user?.id;
-        const result: D1Result<DBRow> = await db.prepare(
-            `SELECT * FROM reminders WHERE user_id = ?`,
-        ).bind(user_id).run();
+        const result: D1Result<DBRow> = await db
+            .prepare(`SELECT * FROM reminders WHERE user_id = ?`)
+            .bind(user_id)
+            .run();
         const remindersText = result.results.map((element, index, array) => {
             const { message, timestamp } = element;
             const date = new Date(timestamp * 1000);
             return `- ${message} <t:${timestamp}:F>`;
-        })
+        });
         return new JsonResponse({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data: {

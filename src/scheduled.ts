@@ -15,17 +15,16 @@ export async function scheduled(controller: ScheduledController, env: Env, ctx: 
             body: JSON.stringify({ recipient_id: user_id }),
             headers: {
                 Authorization: `Bot ${env.DISCORD_TOKEN}`,
-                "Content-Type": "application/json"
-            }
+                'Content-Type': 'application/json',
+            },
         });
         if (dm_response.status !== 200) {
-            console.error(`Failed to send DM to user ${user_id}: ${dm_response} ${dm_response.statusText}`);
+            console.error(`Failed to open DM with user ${user_id}: ${dm_response} ${dm_response.statusText}`);
             console.error(dm_response.body);
-            throw Error;
             continue;
         }
-        const channel_id = (await dm_response.json() as DAPI.APIChannel).id;
-        const dm_message = await fetch(`https://discord.com/api/v10/channels/${channel_id}/messages`, {
+        const channel_id = ((await dm_response.json()) as DAPI.APIChannel).id;
+        await fetch(`https://discord.com/api/v10/channels/${channel_id}/messages`, {
             method: 'POST',
             body: JSON.stringify({
                 content: `You asked me to remind you about "${message}" at <t:${timestamp}:F>.`,
@@ -39,6 +38,5 @@ export async function scheduled(controller: ScheduledController, env: Env, ctx: 
 }
 
 export default {
-    scheduled
+    scheduled,
 };
-
