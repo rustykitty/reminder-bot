@@ -1,6 +1,6 @@
 import { JsonResponse } from '../response.js';
 import { Command } from './command.js';
-import { getOptions } from './options.js';
+import { getOptions } from './utility.js';
 import * as DAPI from 'discord-api-types/v10';
 import Groq from 'groq-sdk';
 import { InteractionResponseType } from 'discord-interactions';

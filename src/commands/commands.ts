@@ -4,7 +4,7 @@ import { bored } from './bored.js';
 
 const commands: Record<string, Command> = {
     remind,
-    bored,
+    bored
 };
 
 export default commands;

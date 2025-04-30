@@ -4,7 +4,7 @@ import * as chrono from 'chrono-node';
 import { InteractionResponseType } from 'discord-interactions';
 import { JsonResponse } from '../response.js';
 import { Command } from './command.js';
-import { getOptions } from './options.js';
+import { getOptions, getUser } from './utility.js';
 
 export const remind: Command = {
     data: {
@@ -27,7 +27,7 @@ export const remind: Command = {
     },
     execute: async (interaction, env) => {
         const db: D1Database = env.DB;
-        const user_id = interaction.guild ? interaction.member?.user.id : interaction.user?.id;
+        const user_id = getUser(interaction);
         const { time, message } = getOptions(interaction);
         const date: Date | null = chrono.parseDate(time.value as string);
         if (date === null) {
@@ -47,7 +47,7 @@ export const remind: Command = {
                 },
             });
         }
-        const result: D1Result<DBRow> = await db
+        db
             .prepare(`INSERT INTO reminders (user_id, message, timestamp) VALUES (?, ?, ?)`)
             .bind(user_id, message.value, ts)
             .run();
