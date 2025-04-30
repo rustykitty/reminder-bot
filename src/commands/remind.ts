@@ -80,9 +80,9 @@ export const list_reminders: Command = {
             };
         }
         const remindersText = result.results.map((element, index, array) => {
-            const { message, timestamp } = element;
+            const { id, message, timestamp } = element;
             const date = new Date(timestamp * 1000);
-            return `- ${message} <t:${timestamp}:F>`;
+            return `- ${message} <t:${timestamp}:F> (ID: \`${id}\`)`;
         });
         return {
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
