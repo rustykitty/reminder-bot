@@ -71,6 +71,14 @@ export const list_reminders: Command = {
             .prepare(`SELECT * FROM reminders WHERE user_id = ?`)
             .bind(user_id)
             .run();
+        if (result.results.length === 0) {
+            return {
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                data: {
+                    content: `You do not have any reminders.`,
+                },
+            };
+        }
         const remindersText = result.results.map((element, index, array) => {
             const { message, timestamp } = element;
             const date = new Date(timestamp * 1000);
@@ -79,7 +87,7 @@ export const list_reminders: Command = {
         return {
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
             data: {
-                content: `You have the following reminders:`,
+                content: `You have the following reminders:\n${remindersText.join('\n')}`,
             },
         };
     },

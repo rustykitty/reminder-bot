@@ -2,17 +2,13 @@
 
 import { exec } from 'child_process';
 
-import cron from 'node-cron';
+const cron_url = `http://localhost:8787/__scheduled?cron=${encodeURIComponent("* * * * *")}`;
 
-const cron_schedule = '* * * * *';
-
-const cron_url = `http://localhost:8787/__scheduled?cron=${encodeURIComponent(cron_schedule)}`;
-
-cron.schedule(cron_schedule, async () => {
+setInterval(async () => {
     const result = await fetch(cron_url);
     if (!result.ok) {
         console.error(result.status + ' ' + result.statusText);
     }
-});
+}, 60000);
 
 console.log('Cron server start');

@@ -38,10 +38,11 @@ router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
         });
     } else if (interaction.type === InteractionType.APPLICATION_COMMAND) {
         // Most user commands will come as `APPLICATION_COMMAND`.
-        const command = interaction.data.name.toLowerCase();
-        if (commands[command]) {
+        const commandName = interaction.data.name.toLowerCase();
+        const command = commands.find(cmd => cmd.data.name === commandName);
+        if (command) {
             try {
-                let response = await commands[command].execute(interaction, env);
+                let response = await command.execute(interaction, env);
                 return new JsonResponse(response);
             } catch (e: any) {
                 console.error(e);
