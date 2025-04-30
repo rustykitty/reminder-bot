@@ -36,11 +36,11 @@ export const bored: Command = {
     execute: async (interaction, env) => {
         const { prompt } = getOptions(interaction);
         const result = await getBoredActivity(env.GROQ_API_KEY);
-        return new JsonResponse({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        return {
+            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
             data: {
                 content: `AI says: ${result}`,
             },
-        });
+        };
     },
 };

@@ -3,6 +3,6 @@ import * as DAPI from 'discord-api-types/v10';
 
 interface Command {
     options?: DAPI.APIApplicationCommandOption[];
-    execute: (interaction: DAPI.APIApplicationCommandInteraction, env: Env) => Promise<Response>;
+    execute: (interaction: DAPI.APIApplicationCommandInteraction, env: Env) => Promise<DAPI.APIInteractionResponse>;
     data: DAPI.RESTPostAPIApplicationCommandsJSONBody;
 }

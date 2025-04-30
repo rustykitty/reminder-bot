@@ -21,7 +21,9 @@ export async function scheduled(controller: ScheduledController, env: Env, ctx: 
             },
         });
         if (getChannelResponse.status !== 200) {
-            console.error(`Failed to open DM with user ${user_id}: ${getChannelResponse} ${getChannelResponse.statusText}`);
+            console.error(
+                `Failed to open DM with user ${user_id}: ${getChannelResponse} ${getChannelResponse.statusText}`,
+            );
             console.error(getChannelResponse.body);
             continue;
         }
@@ -43,11 +45,7 @@ export async function scheduled(controller: ScheduledController, env: Env, ctx: 
             continue;
         }
 
-        await db
-            .prepare('DELETE FROM reminders WHERE id = ?')
-            .bind(id)
-            .run();
-
+        await db.prepare('DELETE FROM reminders WHERE id = ?').bind(id).run();
     }
 }
 

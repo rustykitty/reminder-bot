@@ -41,7 +41,8 @@ router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
         const command = interaction.data.name.toLowerCase();
         if (commands[command]) {
             try {
-                return await commands[command].execute(interaction, env);
+                let response = await commands[command].execute(interaction, env);
+                return new JsonResponse(response);
             } catch (e: any) {
                 console.error(e);
                 return new JsonResponse({

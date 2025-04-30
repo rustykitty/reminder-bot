@@ -1,14 +1,7 @@
 import { InteractionResponseFlags, InteractionResponseType } from 'discord-interactions';
 
 export class JsonResponse extends Response {
-    constructor(
-        body: {
-            type?: InteractionResponseType;
-            data?: { content: string } | { content: string; flags: InteractionResponseFlags };
-            error?: string;
-        },
-        init?: ResponseInit,
-    ) {
+    constructor(body: any, init?: ResponseInit) {
         const jsonBody = JSON.stringify(body);
         init = init ?? {
             headers: {

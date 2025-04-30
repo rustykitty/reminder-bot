@@ -31,32 +31,31 @@ export const remind: Command = {
         const { time, message } = getOptions(interaction);
         const date: Date | null = chrono.parseDate(time.value as string);
         if (date === null) {
-            return new JsonResponse({
-                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            return {
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
                 data: {
                     content: 'Invalid date format.',
                 },
-            });
+            };
         }
         const ts = Math.floor(+date / 1000);
         if (ts <= Math.floor(+new Date() / 1000)) {
-            return new JsonResponse({
+            return {
                 type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: {
                     content: `You can't set a reminder in the past!`,
                 },
-            });
+            };
         }
-        db
-            .prepare(`INSERT INTO reminders (user_id, message, timestamp) VALUES (?, ?, ?)`)
+        db.prepare(`INSERT INTO reminders (user_id, message, timestamp) VALUES (?, ?, ?)`)
             .bind(user_id, message.value, ts)
             .run();
-        return new JsonResponse({
+        return {
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data: {
                 content: `I will remind you about "${message.value}" <t:${ts}:R>.`,
             },
-        });
+        };
     },
 };
 
@@ -77,11 +76,11 @@ export const list_reminders: Command = {
             const date = new Date(timestamp * 1000);
             return `- ${message} <t:${timestamp}:F>`;
         });
-        return new JsonResponse({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        return {
+            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
             data: {
                 content: `You have the following reminders:`,
             },
-        });
+        };
     },
 };
