@@ -47,7 +47,9 @@ export const remind: Command = {
                 },
             };
         }
-        db.prepare(`INSERT INTO reminders (user_id, message, timestamp) VALUES (?, ?, ?)`)
+        db.prepare(
+            `INSERT INTO reminders (user_id, message, timestamp) VALUES (?, ?, ?)`,
+        )
             .bind(user_id, message.value, ts)
             .run();
         return {
@@ -66,7 +68,10 @@ export const list_reminders: Command = {
     },
     execute: async (interaction, env) => {
         const db: D1Database = env.DB;
-        const user_id = interaction.guild ? interaction.member?.user.id : interaction.user?.id;
+        const user_id =
+            interaction.guild ?
+                interaction.member?.user.id
+            :   interaction.user?.id;
         const result: D1Result<RemindersRow> = await db
             .prepare(`SELECT * FROM reminders WHERE user_id = ?`)
             .bind(user_id)

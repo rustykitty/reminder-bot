@@ -1,4 +1,7 @@
-import { InteractionResponseFlags, InteractionResponseType } from 'discord-interactions';
+import {
+    InteractionResponseFlags,
+    InteractionResponseType,
+} from 'discord-interactions';
 
 export class JsonResponse extends Response {
     constructor(body: any, init?: ResponseInit) {

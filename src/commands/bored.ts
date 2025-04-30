@@ -14,7 +14,10 @@ async function getBoredActivity(apiKey: string, introText?: string) {
     let groq = new Groq({ apiKey });
 
     const prompt =
-        systemPrompt + (introText ? `\n\nUser written a brief introduction about themselves: ${introText}` : '');
+        systemPrompt +
+        (introText ?
+            `\n\nUser written a brief introduction about themselves: ${introText}`
+        :   '');
 
     const chatCompletion = await groq.chat.completions.create({
         model: 'llama-3.3-70b-versatile',
@@ -43,7 +46,10 @@ export const bored: Command = {
             .bind(getUser(interaction))
             .run();
 
-        const interest = interestResult.results.length > 0 ? interestResult.results[0]?.self_intro : undefined;
+        const interest =
+            interestResult.results.length > 0 ?
+                interestResult.results[0]?.self_intro
+            :   undefined;
 
         const result = await getBoredActivity(env.GROQ_API_KEY, interest);
         return {
@@ -63,16 +69,24 @@ export const getIntro: Command = {
         description: 'Get your introduction about yourself.',
     },
     execute: async (interaction, env) => {
-        const introResult: D1Result<UserDataRow> = await env.DB.prepare('SELECT self_intro FROM user_data WHERE id = ?')
+        const introResult: D1Result<UserDataRow> = await env.DB.prepare(
+            'SELECT self_intro FROM user_data WHERE id = ?',
+        )
             .bind(getUser(interaction))
             .run();
 
-        const intro = introResult.results.length > 0 ? introResult.results[0]?.self_intro : undefined;
+        const intro =
+            introResult.results.length > 0 ?
+                introResult.results[0]?.self_intro
+            :   undefined;
 
         return {
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
             data: {
-                content: intro ? `Your introduction is: ${intro}` : `You do not have an introduction set.`,
+                content:
+                    intro ?
+                        `Your introduction is: ${intro}`
+                    :   `You do not have an introduction set.`,
             },
         };
     },
@@ -81,7 +95,8 @@ export const getIntro: Command = {
 export const setIntro: Command = {
     data: {
         name: 'set-intro',
-        description: 'Set a short introduction about yourself for the AI to know you better.',
+        description:
+            'Set a short introduction about yourself for the AI to know you better.',
     },
     execute: async (interaction, env) => {
         return {
@@ -98,7 +113,8 @@ export const setIntro: Command = {
                                 custom_id: 'intro',
                                 label: 'Your introduction',
                                 style: 1,
-                                placeholder: 'Tell the AI about yourself! Set blank to remove.',
+                                placeholder:
+                                    'Tell the AI about yourself! Set blank to remove.',
                                 min_length: 1,
                                 max_length: 1024,
                                 required: false,
@@ -116,7 +132,9 @@ export const setIntro: Command = {
         const intro = introComponent.value as string;
         const userId = getUser(interaction as unknown as DAPI.APIInteraction);
 
-        await env.DB.prepare('INSERT OR REPLACE INTO user_data (id, self_intro) VALUES (?, ?)')
+        await env.DB.prepare(
+            'INSERT OR REPLACE INTO user_data (id, self_intro) VALUES (?, ?)',
+        )
             .bind(userId, intro)
             .run();
 

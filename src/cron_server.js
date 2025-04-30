@@ -2,7 +2,7 @@
 
 import { exec } from 'child_process';
 
-const cron_url = `http://localhost:8787/__scheduled?cron=${encodeURIComponent("* * * * *")}`;
+const cron_url = `http://localhost:8787/__scheduled?cron=${encodeURIComponent('* * * * *')}`;
 
 setInterval(async () => {
     const result = await fetch(cron_url);

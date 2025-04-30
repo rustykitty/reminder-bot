@@ -1,4 +1,8 @@
-import { InteractionResponseType, InteractionType, InteractionResponseFlags } from 'discord-interactions';
+import {
+    InteractionResponseType,
+    InteractionType,
+    InteractionResponseFlags,
+} from 'discord-interactions';
 
 import * as DAPI from 'discord-api-types/v10';
 
@@ -8,14 +12,22 @@ import * as DAPI from 'discord-api-types/v10';
 export function getOptions(
     interaction: DAPI.APIApplicationCommandInteraction,
 ): Record<string, DAPI.APIApplicationCommandInteractionDataBasicOption> {
-    if (!('options' in interaction.data) || interaction.data.options === undefined) return {};
+    if (
+        !('options' in interaction.data) ||
+        interaction.data.options === undefined
+    )
+        return {};
 
     return interaction.data.options.reduce(
         (acc, curr) => {
-            acc[curr.name] = curr as DAPI.APIApplicationCommandInteractionDataBasicOption;
+            acc[curr.name] =
+                curr as DAPI.APIApplicationCommandInteractionDataBasicOption;
             return acc;
         },
-        {} as Record<string, DAPI.APIApplicationCommandInteractionDataBasicOption>,
+        {} as Record<
+            string,
+            DAPI.APIApplicationCommandInteractionDataBasicOption
+        >,
     );
 }
 

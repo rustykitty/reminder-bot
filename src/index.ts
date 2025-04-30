@@ -1,17 +1,27 @@
 import { AutoRouter } from 'itty-router';
-import { InteractionResponseFlags, InteractionResponseType, InteractionType, verifyKey } from 'discord-interactions';
+import {
+    InteractionResponseFlags,
+    InteractionResponseType,
+    InteractionType,
+    verifyKey,
+} from 'discord-interactions';
 import { JsonResponse } from './response.js';
 import commands from './commands/commands.js';
 import { scheduled } from './scheduled.js';
 
 const router = AutoRouter();
 
-async function verifyDiscordRequest(request: Request, env: Env): Promise<{ interaction?: any; isValid: boolean }> {
+async function verifyDiscordRequest(
+    request: Request,
+    env: Env,
+): Promise<{ interaction?: any; isValid: boolean }> {
     const signature = request.headers.get('X-Signature-Ed25519');
     const timestamp = request.headers.get('X-Signature-Timestamp');
     const body: string = await request.text();
     const isValidRequest =
-        signature && timestamp && (await verifyKey(body, signature, timestamp, env.DISCORD_PUBLIC_KEY));
+        signature &&
+        timestamp &&
+        (await verifyKey(body, signature, timestamp, env.DISCORD_PUBLIC_KEY));
     if (!isValidRequest) {
         return { isValid: false };
     }
@@ -20,7 +30,9 @@ async function verifyDiscordRequest(request: Request, env: Env): Promise<{ inter
 }
 
 router.get('/', (request: Request, env: Env) => {
-    return new Response(`Bot is running on user ID ${env.DISCORD_APPLICATION_ID}`);
+    return new Response(
+        `Bot is running on user ID ${env.DISCORD_APPLICATION_ID}`,
+    );
 });
 
 router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
@@ -39,7 +51,7 @@ router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
     } else if (interaction.type === InteractionType.APPLICATION_COMMAND) {
         // Most user commands will come as `APPLICATION_COMMAND`.
         const commandName = interaction.data.name.toLowerCase();
-        const command = commands.find(cmd => cmd.data.name === commandName);
+        const command = commands.find((cmd) => cmd.data.name === commandName);
         if (command) {
             try {
                 let response = await command.execute(interaction, env);
@@ -62,7 +74,9 @@ router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
             });
         }
     } else if (interaction.type === InteractionType.MODAL_SUBMIT) {
-        const command = commands.find(cmd => cmd.data.name === interaction.data.custom_id);
+        const command = commands.find(
+            (cmd) => cmd.data.name === interaction.data.custom_id,
+        );
         if (command) {
             if (!command.formSubmitHandler) {
                 return new JsonResponse({
@@ -73,7 +87,10 @@ router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
                 });
             }
             try {
-                let response = await command.formSubmitHandler(interaction, env);
+                let response = await command.formSubmitHandler(
+                    interaction,
+                    env,
+                );
                 return new JsonResponse(response);
             } catch (e: any) {
                 console.error(e);
