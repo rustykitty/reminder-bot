@@ -1,6 +1,6 @@
 import * as DAPI from 'discord-api-types/v10';
 
-async function sendDM(reminder: DBRow, env: Env) {
+async function sendDM(reminder: RemindersRow, env: Env) {
     const db: D1Database = env.DB;
     const { id, user_id, message, timestamp } = reminder;
     const getChannelResponse = await fetch(`https://discord.com/api/v10/users/@me/channels`, {
@@ -41,11 +41,11 @@ async function sendDM(reminder: DBRow, env: Env) {
 export async function scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
     const db: D1Database = env.DB;
     const now = Math.floor(+new Date() / 1000);
-    const reminders: DBRow[] = (
+    const reminders: RemindersRow[] = (
         (await db
             .prepare('SELECT * FROM reminders WHERE timestamp <= ? ORDER BY timestamp ASC')
             .bind(now)
-            .run()) as D1Result<DBRow>
+            .run()) as D1Result<RemindersRow>
     ).results;
 
     let promises: Promise<unknown>[] = [];

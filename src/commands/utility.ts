@@ -19,7 +19,7 @@ export function getOptions(
     );
 }
 
-export function getUser(interaction: DAPI.APIApplicationCommandInteraction): string {
+export function getUser(interaction: DAPI.APIInteraction): string {
     // @ts-expect-error
     return interaction.guild ? interaction.member.user.id : interaction.user.id;
 }

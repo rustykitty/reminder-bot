@@ -6,3 +6,8 @@ CREATE TABLE reminders (
     message VARCHAR(255) NOT NULL,
     timestamp INTEGER NOT NULL
 );
+DROP TABLE IF EXISTS user_data;
+CREATE TABLE user_data (
+    id VARCHAR(20) PRIMARY KEY,
+    self_intro VARCHAR(1024)
+);

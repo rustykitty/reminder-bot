@@ -67,7 +67,7 @@ export const list_reminders: Command = {
     execute: async (interaction, env) => {
         const db: D1Database = env.DB;
         const user_id = interaction.guild ? interaction.member?.user.id : interaction.user?.id;
-        const result: D1Result<DBRow> = await db
+        const result: D1Result<RemindersRow> = await db
             .prepare(`SELECT * FROM reminders WHERE user_id = ?`)
             .bind(user_id)
             .run();

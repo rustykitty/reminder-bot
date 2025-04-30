@@ -61,6 +61,30 @@ router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
                 },
             });
         }
+    } else if (interaction.type === InteractionType.MODAL_SUBMIT) {
+        const command = commands.find(cmd => cmd.data.name === interaction.data.custom_id);
+        if (command) {
+            if (!command.formSubmitHandler) {
+                return new JsonResponse({
+                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    data: {
+                        content: 'Error',
+                    },
+                });
+            }
+            try {
+                let response = await command.formSubmitHandler(interaction, env);
+                return new JsonResponse(response);
+            } catch (e: any) {
+                console.error(e);
+                return new JsonResponse({
+                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    data: {
+                        content: 'An error occurred: \n' + (e.stack ?? e),
+                    },
+                });
+            }
+        }
     }
 
     return new JsonResponse({ error: 'Unknown Type' }, { status: 400 });
