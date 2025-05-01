@@ -35,78 +35,90 @@ router.get('/', (request: Request, env: Env, ctx: ExecutionContext) => {
     );
 });
 
-router.post('/', async (request: Request, env: Env, ctx: ExecutionContext): Promise<JsonResponse> => {
-    const { isValid, interaction } = await verifyDiscordRequest(request, env);
-
-    if (!isValid || !interaction) {
-        return new Response('Bad request signature.', { status: 401 });
-    }
-
-    if (interaction.type === InteractionType.PING) {
-        // The `PING` message is used during the initial webhook handshake, and is
-        // required to configure the webhook in the developer portal.
-        return new JsonResponse({
-            type: InteractionResponseType.PONG,
-        });
-    } else if (interaction.type === InteractionType.APPLICATION_COMMAND) {
-        // Most user commands will come as `APPLICATION_COMMAND`.
-        const commandName = interaction.data.name.toLowerCase();
-        const command = commands.find((cmd) => cmd.data.name === commandName);
-        if (command) {
-            try {
-                let response = await command.execute(interaction, env, ctx);
-                return new JsonResponse(response);
-            } catch (e: any) {
-                console.error(e);
-                return new JsonResponse({
-                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                    data: {
-                        content: 'An error occurred: \n' + (e.stack ?? e),
-                    },
-                });
-            }
-        } else {
-            return new JsonResponse({
-                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                data: {
-                    content: `Unknown command ${interaction.data.name}`,
-                },
-            });
-        }
-    } else if (interaction.type === InteractionType.MODAL_SUBMIT) {
-        const command = commands.find(
-            (cmd) => cmd.data.name === interaction.data.custom_id,
+router.post(
+    '/',
+    async (
+        request: Request,
+        env: Env,
+        ctx: ExecutionContext,
+    ): Promise<JsonResponse> => {
+        const { isValid, interaction } = await verifyDiscordRequest(
+            request,
+            env,
         );
-        if (command) {
-            if (!command.formSubmitHandler) {
+
+        if (!isValid || !interaction) {
+            return new Response('Bad request signature.', { status: 401 });
+        }
+
+        if (interaction.type === InteractionType.PING) {
+            // The `PING` message is used during the initial webhook handshake, and is
+            // required to configure the webhook in the developer portal.
+            return new JsonResponse({
+                type: InteractionResponseType.PONG,
+            });
+        } else if (interaction.type === InteractionType.APPLICATION_COMMAND) {
+            // Most user commands will come as `APPLICATION_COMMAND`.
+            const commandName = interaction.data.name.toLowerCase();
+            const command = commands.find(
+                (cmd) => cmd.data.name === commandName,
+            );
+            if (command) {
+                try {
+                    let response = await command.execute(interaction, env, ctx);
+                    return new JsonResponse(response);
+                } catch (e: any) {
+                    console.error(e);
+                    return new JsonResponse({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                            content: 'An error occurred: \n' + (e.stack ?? e),
+                        },
+                    });
+                }
+            } else {
                 return new JsonResponse({
                     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                     data: {
-                        content: 'Error',
+                        content: `Unknown command ${interaction.data.name}`,
                     },
                 });
             }
-            try {
-                let response = await command.formSubmitHandler(
-                    interaction,
-                    env,
-                    ctx
-                );
-                return new JsonResponse(response);
-            } catch (e: any) {
-                console.error(e);
-                return new JsonResponse({
-                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                    data: {
-                        content: 'An error occurred: \n' + (e.stack ?? e),
-                    },
-                });
+        } else if (interaction.type === InteractionType.MODAL_SUBMIT) {
+            const command = commands.find(
+                (cmd) => cmd.data.name === interaction.data.custom_id,
+            );
+            if (command) {
+                if (!command.formSubmitHandler) {
+                    return new JsonResponse({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                            content: 'Error',
+                        },
+                    });
+                }
+                try {
+                    let response = await command.formSubmitHandler(
+                        interaction,
+                        env,
+                        ctx,
+                    );
+                    return new JsonResponse(response);
+                } catch (e: any) {
+                    console.error(e);
+                    return new JsonResponse({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                            content: 'An error occurred: \n' + (e.stack ?? e),
+                        },
+                    });
+                }
             }
         }
-    }
 
-    return new JsonResponse({ error: 'Unknown Type' }, { status: 400 });
-});
+        return new JsonResponse({ error: 'Unknown Type' }, { status: 400 });
+    },
+);
 
 router.all('*', () => new Response('Not Found.', { status: 404 }));
 
