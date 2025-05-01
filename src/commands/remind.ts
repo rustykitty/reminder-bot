@@ -68,10 +68,7 @@ export const list_reminders: Command = {
     },
     execute: async (interaction, env) => {
         const db: D1Database = env.DB;
-        const user_id =
-            interaction.guild ?
-                interaction.member?.user.id
-            :   interaction.user?.id;
+        const user_id = getUser(interaction);
         const result: D1Result<RemindersRow> = await db
             .prepare(`SELECT * FROM reminders WHERE user_id = ?`)
             .bind(user_id)
@@ -95,5 +92,50 @@ export const list_reminders: Command = {
                 content: `You have the following reminders:\n${remindersText.join('\n')}`,
             },
         };
+    },
+};
+
+export const remove_reminder: Command = {
+    data: {
+        name: 'remove-reminder',
+        description: 'Remove a reminder',
+        options: [
+            {
+                type: DAPI.ApplicationCommandOptionType.Integer,
+                name: 'id',
+                description: 'The ID of the reminder to remove',
+                required: true,
+            },
+        ],
+    },
+    execute: async (interaction, env) => {
+        const db: D1Database = env.DB;
+        const user_id = getUser(interaction);
+        const { id } = getOptions(interaction);
+        const results = await db.batch([
+            db
+                .prepare(`SELECT * FROM reminders WHERE user_id = ? AND id = ?`)
+                .bind(user_id, id.value),
+            db
+                .prepare(`DELETE FROM reminders WHERE user_id = ? AND id = ?`)
+                .bind(user_id, id.value),
+        ]);
+        const reminder: RemindersRow = (results[0] as D1Result<RemindersRow>)
+            .results[0];
+        if (reminder) {
+            return {
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
+                data: {
+                    content: `Removed reminder with ID \`${id.value}\` (was "${reminder.message}", set for <t:${reminder.timestamp}:F>)`,
+                },
+            };
+        } else {
+            return {
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
+                data: {
+                    content: `No reminder found with ID \`${id.value}\`. It may have already triggered or been removed.`,
+                },
+            };
+        }
     },
 };

@@ -132,6 +132,18 @@ export const setIntro: Command = {
         const intro = introComponent.value as string;
         const userId = getUser(interaction as unknown as DAPI.APIInteraction);
 
+        if (!intro) {
+            await env.DB.prepare('DELETE FROM user_data WHERE id = ?')
+                .bind(userId)
+                .run();
+            return {
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
+                data: {
+                    content: `Succesfully removed introduction.`,
+                },
+            };
+        }
+
         await env.DB.prepare(
             'INSERT OR REPLACE INTO user_data (id, self_intro) VALUES (?, ?)',
         )
@@ -141,7 +153,7 @@ export const setIntro: Command = {
         return {
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
             data: {
-                content: `Succesfully updated introduction`,
+                content: `Succesfully set introduction to "${intro}".`,
             },
         };
     },
