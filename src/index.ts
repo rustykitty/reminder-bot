@@ -29,13 +29,13 @@ async function verifyDiscordRequest(
     return { interaction: JSON.parse(body), isValid: true };
 }
 
-router.get('/', (request: Request, env: Env) => {
+router.get('/', (request: Request, env: Env, ctx: ExecutionContext) => {
     return new Response(
         `Bot is running on user ID ${env.DISCORD_APPLICATION_ID}`,
     );
 });
 
-router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
+router.post('/', async (request: Request, env: Env, ctx: ExecutionContext): Promise<JsonResponse> => {
     const { isValid, interaction } = await verifyDiscordRequest(request, env);
 
     if (!isValid || !interaction) {
@@ -54,7 +54,7 @@ router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
         const command = commands.find((cmd) => cmd.data.name === commandName);
         if (command) {
             try {
-                let response = await command.execute(interaction, env);
+                let response = await command.execute(interaction, env, ctx);
                 return new JsonResponse(response);
             } catch (e: any) {
                 console.error(e);
@@ -90,6 +90,7 @@ router.post('/', async (request: Request, env: Env): Promise<JsonResponse> => {
                 let response = await command.formSubmitHandler(
                     interaction,
                     env,
+                    ctx
                 );
                 return new JsonResponse(response);
             } catch (e: any) {

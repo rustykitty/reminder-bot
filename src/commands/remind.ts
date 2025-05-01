@@ -25,7 +25,7 @@ export const remind: Command = {
             },
         ],
     },
-    execute: async (interaction, env) => {
+    execute: async (interaction, env, ctx) => {
         const db: D1Database = env.DB;
         const user_id = getUser(interaction);
         const { time, message } = getOptions(interaction);
@@ -66,7 +66,7 @@ export const list_reminders: Command = {
         name: 'list-reminders',
         description: 'List your reminders',
     },
-    execute: async (interaction, env) => {
+    execute: async (interaction, env, ctx) => {
         const db: D1Database = env.DB;
         const user_id = getUser(interaction);
         const result: D1Result<RemindersRow> = await db
@@ -108,7 +108,7 @@ export const remove_reminder: Command = {
             },
         ],
     },
-    execute: async (interaction, env) => {
+    execute: async (interaction, env, ctx) => {
         const db: D1Database = env.DB;
         const user_id = getUser(interaction);
         const { id } = getOptions(interaction);

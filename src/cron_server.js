@@ -4,11 +4,17 @@ import { exec } from 'child_process';
 
 const cron_url = `http://localhost:8787/__scheduled?cron=${encodeURIComponent('* * * * *')}`;
 
-setInterval(async () => {
-    const result = await fetch(cron_url);
-    if (!result.ok) {
-        console.error(result.status + ' ' + result.statusText);
-    }
+setInterval(() => {
+    const result = fetch(cron_url).then(
+        (response) => {
+            if (!result.ok) {
+                console.error(result.status + ' ' + result.statusText);
+            }
+        },
+        (error) => {
+            console.error(error);
+        },
+    );
 }, 60000);
 
 console.log('Cron server start');

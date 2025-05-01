@@ -14,10 +14,7 @@ async function getBoredActivity(apiKey: string, introText?: string) {
     let groq = new Groq({ apiKey });
 
     const prompt =
-        systemPrompt +
-        (introText ?
-            `\n\nUser written a brief introduction about themselves: ${introText}`
-        :   '');
+        systemPrompt + (introText ? `\n\nUser written a brief introduction about themselves: ${introText}` : '');
 
     const chatCompletion = await groq.chat.completions.create({
         model: 'llama-3.3-70b-versatile',
@@ -37,28 +34,39 @@ export const bored: Command = {
         name: 'bored',
         description: 'Get a random activity to do from AI!',
     },
-    execute: async (interaction, env) => {
-        const { prompt } = getOptions(interaction);
+    execute: async (interaction, env, ctx) => {
+        ctx.waitUntil((async () => {
+            const interestResult: D1Result<UserDataRow> = await env.DB.prepare(
+                'SELECT self_intro FROM user_data WHERE id = ?',
+            )
+                .bind(getUser(interaction))
+                .run();
 
-        const interestResult: D1Result<UserDataRow> = await env.DB.prepare(
-            'SELECT self_intro FROM user_data WHERE id = ?',
-        )
-            .bind(getUser(interaction))
-            .run();
+            const interest = interestResult.results.length > 0 ? interestResult.results[0]?.self_intro : undefined;
 
-        const interest =
-            interestResult.results.length > 0 ?
-                interestResult.results[0]?.self_intro
-            :   undefined;
+            const suggestion = await getBoredActivity(env.GROQ_API_KEY, interest);
+            const result = await fetch(
+                `https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${interaction.token}/messages/@original`,
+                {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        content: `
+AI suggests: ${suggestion}
+-# AI repeatedly providing activites you dislike? Use the /set-intro command to write a short introduction of yourself so the AI can know you better!`,
+                    }),
+                    headers: {
+                        Authorization: `Bot ${env.DISCORD_TOKEN}`,
+                        'Content-Type': 'application/json',
+                    },
+                },
+            );
+            if (result.status !== 200) {
+                console.error('error: ' + result.status + ' ' + result.statusText);
+            }
+        })());
 
-        const result = await getBoredActivity(env.GROQ_API_KEY, interest);
         return {
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
-            data: {
-                content: `
-AI suggests: ${result}
--# AI consistently providing activites you dislike? Use the /set-intro command to write a short introduction of yourself so the AI can know you better!`,
-            },
+            type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE as any,
         };
     },
 };
@@ -68,25 +76,17 @@ export const getIntro: Command = {
         name: 'get-intro',
         description: 'Get your introduction about yourself.',
     },
-    execute: async (interaction, env) => {
-        const introResult: D1Result<UserDataRow> = await env.DB.prepare(
-            'SELECT self_intro FROM user_data WHERE id = ?',
-        )
+    execute: async (interaction, env, ctx) => {
+        const introResult: D1Result<UserDataRow> = await env.DB.prepare('SELECT self_intro FROM user_data WHERE id = ?')
             .bind(getUser(interaction))
             .run();
 
-        const intro =
-            introResult.results.length > 0 ?
-                introResult.results[0]?.self_intro
-            :   undefined;
+        const intro = introResult.results.length > 0 ? introResult.results[0]?.self_intro : undefined;
 
         return {
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
             data: {
-                content:
-                    intro ?
-                        `Your introduction is: ${intro}`
-                    :   `You do not have an introduction set.`,
+                content: intro ? `Your introduction is: ${intro}` : `You do not have an introduction set.`,
             },
         };
     },
@@ -95,10 +95,9 @@ export const getIntro: Command = {
 export const setIntro: Command = {
     data: {
         name: 'set-intro',
-        description:
-            'Set a short introduction about yourself for the AI to know you better.',
+        description: 'Set a short introduction about yourself for the AI to know you better.',
     },
-    execute: async (interaction, env) => {
+    execute: async (interaction, env, ctx) => {
         return {
             type: InteractionResponseType.MODAL as any,
             data: {
@@ -113,8 +112,7 @@ export const setIntro: Command = {
                                 custom_id: 'intro',
                                 label: 'Your introduction',
                                 style: 1,
-                                placeholder:
-                                    'Tell the AI about yourself! Set blank to remove.',
+                                placeholder: 'Tell the AI about yourself! Set blank to remove.',
                                 min_length: 1,
                                 max_length: 1024,
                                 required: false,
@@ -125,7 +123,7 @@ export const setIntro: Command = {
             },
         };
     },
-    formSubmitHandler: async (interaction, env) => {
+    formSubmitHandler: async (interaction, env, ctx) => {
         console.log(interaction);
         const components = interaction.data.components[0].components;
         const introComponent = components[0];
@@ -133,9 +131,7 @@ export const setIntro: Command = {
         const userId = getUser(interaction as unknown as DAPI.APIInteraction);
 
         if (!intro) {
-            await env.DB.prepare('DELETE FROM user_data WHERE id = ?')
-                .bind(userId)
-                .run();
+            await env.DB.prepare('DELETE FROM user_data WHERE id = ?').bind(userId).run();
             return {
                 type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
                 data: {
@@ -144,9 +140,7 @@ export const setIntro: Command = {
             };
         }
 
-        await env.DB.prepare(
-            'INSERT OR REPLACE INTO user_data (id, self_intro) VALUES (?, ?)',
-        )
+        await env.DB.prepare('INSERT OR REPLACE INTO user_data (id, self_intro) VALUES (?, ?)')
             .bind(userId, intro)
             .run();
 

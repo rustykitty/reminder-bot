@@ -10,10 +10,12 @@ interface Command {
     execute: (
         interaction: DAPI.APIApplicationCommandInteraction,
         env: Env,
+        ctx: ExecutionContext,
     ) => Promise<DAPI.APIInteractionResponse>;
     formSubmitHandler?: (
         interaction: DAPI.APIModalInteractionResponse,
         env: Env,
+        ctx: ExecutionContext,
     ) => Promise<DAPI.APIInteractionResponse>;
     data: DAPI.RESTPostAPIApplicationCommandsJSONBody;
 }
