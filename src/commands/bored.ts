@@ -8,7 +8,7 @@ import { InteractionResponseType } from 'discord-interactions';
 const systemPrompt = `You are a generative large language model that is integrated into a Reminders application. 
                       Your purpose is to provide the user of the application with an activity or task to do when they are bored. 
                       Provide only the name of the task. For example: Going outside and touching grass.
-                      Make sure to keep the response concise, and keep the task to something that anyone can do.`;
+                      Make sure to keep the response concise.`;
 
 async function getBoredActivity(apiKey: string, introText?: string) {
     let groq = new Groq({ apiKey });
