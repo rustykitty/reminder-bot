@@ -5,10 +5,12 @@ import * as DAPI from 'discord-api-types/v10';
 import Groq from 'groq-sdk';
 import { InteractionResponseType } from 'discord-interactions';
 
-const systemPrompt = `You are a generative large language model that is integrated into a Reminders application. 
-                      Your purpose is to provide the user of the application with an activity or task to do when they are bored. 
-                      Provide only the name of the task. For example: Going outside and touching grass.
-                      Make sure to keep the response concise.`;
+const systemPrompt = `You are to serve the role of an feature within a reminders application.
+                      Your purpose is to provide the user of the application with an activity or task to do.
+                      The task should not take too long, taking up an hour AT MAXIMUM.
+                      Provide only the name of the task. For example: Touching grass.
+                      Make sure to keep the response concise, and be sure the activity is something most people can do.
+                      Try to include variety in your responses, but still cater to the user's interests.`;
 
 async function getBoredActivity(apiKey: string, introText?: string) {
     let groq = new Groq({ apiKey });
@@ -16,7 +18,7 @@ async function getBoredActivity(apiKey: string, introText?: string) {
     const prompt =
         systemPrompt +
         (introText ?
-            `\n\nUser written a brief introduction about themselves: ${introText}`
+            `\n\nUser has written a brief introduction about themselves: ${introText}`
         :   '');
 
     const chatCompletion = await groq.chat.completions.create({
