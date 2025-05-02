@@ -34,7 +34,10 @@ export const remind: Command = {
             return {
                 type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
                 data: {
-                    content: 'Invalid date format.',
+                    content: `
+Invalid date format.
+-# Tip: Try using language like "In 5 minutes" or "5 minutes later". An absolute time like "Tomorrow at 3pm" will use UTC time.
+`,
                 },
             };
         }
@@ -77,7 +80,7 @@ export const list_reminders: Command = {
             return {
                 type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: {
-                    content: `You do not have any reminders.`,
+                    content: `You do not have any reminders set.`,
                 },
             };
         }
@@ -103,7 +106,7 @@ export const remove_reminder: Command = {
             {
                 type: DAPI.ApplicationCommandOptionType.Integer,
                 name: 'id',
-                description: 'The ID of the reminder to remove',
+                description: 'The ID of the reminder to remove (gotten from /list-reminders)',
                 required: true,
             },
         ],
