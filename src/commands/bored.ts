@@ -65,7 +65,7 @@ export const bored: Command = {
                         body: JSON.stringify({
                             content: `
 AI suggests: ${suggestion}
--# AI repeatedly providing activites you dislike? Use the /set-intro command to write a short introduction of yourself so the AI can know you better!`,
+-# Tip: You can use the /set-intro command to write a short introduction of yourself so the AI can know you better!`,
                         }),
                         headers: {
                             Authorization: `Bot ${env.DISCORD_TOKEN}`,
