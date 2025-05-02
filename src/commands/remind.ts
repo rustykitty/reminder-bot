@@ -29,15 +29,14 @@ export const remind: Command = {
         const db: D1Database = env.DB;
         const user_id = getUser(interaction);
         const { time, message } = getOptions(interaction);
-        const date: Date | null = chrono.parseDate(time.value as string);
+        const date: Date | null = chrono.parseDate(time.value as string, {
+            timezone: "PDT",
+        });
         if (date === null) {
             return {
                 type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE as any,
                 data: {
-                    content: `
-Invalid date format.
--# Tip: Try using language like "In 5 minutes" or "5 minutes later". An absolute time like "Tomorrow at 3pm" will use UTC time.
-`,
+                    content: `Invalid date format.`,
                 },
             };
         }
