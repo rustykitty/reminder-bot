@@ -127,11 +127,7 @@ export const setIntro: Command = {
             .bind(getUser(interaction))
             .run();
 
-        const intro =
-            introResult.results.length > 0 ?
-                introResult.results[0]?.self_intro
-            :   undefined;
-
+        const intro = introResult.results[0]?.self_intro;
         return {
             type: InteractionResponseType.MODAL as any,
             data: {
@@ -144,12 +140,12 @@ export const setIntro: Command = {
                             {
                                 type: 4,
                                 custom_id: 'intro',
-                                label: 'Your introduction',
+                                label: 'Your introduction (set blank to remove)',
                                 style: 1,
                                 placeholder:
                                     'Tell the AI about yourself! Set blank to remove.',
                                 value: intro,
-                                min_length: 1,
+                                min_length: 0,
                                 max_length: 1024,
                                 required: false,
                             },
